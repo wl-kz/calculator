@@ -2,9 +2,9 @@ const {articleNames, articles, typeNames, levelNames, levelLabels} = window.KZ_D
 
 const modifierOptions = {
   intent: [['aware', 'Осознано'], ['careless', 'Неосторожность']],
-  finish: [['complete', 'Окончено или покушение'], ['stopped', 'Добровольная остановка']],
-  ready: [['planned', 'Предварительный план'], ['affect', 'Аффект'], ['conspiracy', 'Заговор']],
-  reason: [['none', 'Без модификатора'], ['necessity', 'Крайняя необходимость: смягчить'], ['necessity-none', 'Крайняя необходимость: снять наказание'], ['assistance', 'Содействие следствию'], ['official', 'Должностным лицом / против него']]
+  finish: [['complete', 'Завершено'], ['stopped', 'Прервано']],
+  ready: [['planned', 'Плановое'], ['conspiracy', 'Заговор'], ['affect', 'Аффект'], ['other', 'Иное']],
+  reason: [['none', 'Нет'], ['necessity', 'Необходимость'], ['necessity-none', 'Необходимость (снять)'], ['assistance', 'Помощь'], ['official', 'Должностное']]
 };
 
 const $ = selector => document.querySelector(selector);
@@ -39,7 +39,7 @@ function normalizeCharge(saved) {
     ...article,
     intent: saved.intent === -1 || saved.intent === 'careless' ? 'careless' : 'aware',
     finish: saved.finish === -1 || saved.finish === 'stopped' ? 'stopped' : 'complete',
-    ready: saved.ready === -1 || saved.ready === 'affect' ? 'affect' : saved.ready === 1 || saved.ready === 'conspiracy' ? 'conspiracy' : 'planned',
+    ready: saved.ready === -1 || saved.ready === 'affect' ? 'affect' : saved.ready === 1 || saved.ready === 'conspiracy' ? 'conspiracy' : saved.ready === 'other' ? 'other' : 'planned',
     reason: saved.reason === -9 || saved.reason === 'necessity-none' ? 'necessity-none' : saved.reason === -1 || saved.reason === 'necessity' ? 'necessity' : saved.reason === 1 || saved.reason === 'official' ? 'official' : saved.reason === 'assistance' ? 'assistance' : 'none',
     repeat: clamp(Number(saved.repeat) || 1, 1, 5)
   };
@@ -155,8 +155,8 @@ function renderArticles() {
   renderFilters();
 }
 
-function selectMarkup(field, current) {
-  return `<select data-field="${field}">${modifierOptions[field].map(([value, label]) => `<option value="${value}"${value === current ? ' selected' : ''}>${label}</option>`).join('')}</select>`;
+function buttonGroupMarkup(field, current) {
+  return `<div class="button-group" data-field="${field}">${modifierOptions[field].map(([value, label]) => `<button type="button" class="mod-button${value === current ? ' active' : ''}" data-value="${value}" title="${label}">${label}</button>`).join('')}</div>`;
 }
 
 function modifierDelta(charge) {
@@ -193,10 +193,10 @@ function renderCharges() {
     <div class="charge-body">
       <p class="charge-description">${esc(charge.description)}</p>
       <div class="mods">
-        <label>Умысел${selectMarkup('intent', charge.intent)}</label>
-        <label>Завершённость${selectMarkup('finish', charge.finish)}</label>
-        <label>Готовность${selectMarkup('ready', charge.ready)}</label>
-        <label>Намерения${selectMarkup('reason', charge.reason)}</label>
+        <div class="mod-row"><span>Умысел</span>${buttonGroupMarkup('intent', charge.intent)}</div>
+        <div class="mod-row"><span>Завершённость</span>${buttonGroupMarkup('finish', charge.finish)}</div>
+        <div class="mod-row"><span>Готовность</span>${buttonGroupMarkup('ready', charge.ready)}</div>
+        <div class="mod-row"><span>Намерения</span>${buttonGroupMarkup('reason', charge.reason)}</div>
       </div>
       <div class="repeat-control">
         <label>Нарушений этой статьи<span>Повтор повышает тяжесть</span></label>
@@ -329,17 +329,32 @@ $('#articles').addEventListener('click', event => {
 $('#charges').addEventListener('click', event => {
   const details = event.target.closest('.charge');
   if (!details) return;
+  
+  // Удаление статьи
   if (event.target.closest('[data-remove]')) {
     event.preventDefault();
     toggleArticle(details.dataset.code);
     return;
   }
+  
+  // Stepper для количества нарушений
   const step = event.target.closest('[data-step]');
   if (step) {
     const charge = state.find(item => item.code === details.dataset.code);
     updateCharge(details.dataset.code, 'repeat', charge.repeat + Number(step.dataset.step));
     const input = details.querySelector('[data-field="repeat"]');
     if (input) input.value = charge.repeat;
+    return;
+  }
+  
+  // Кнопки модификаторов
+  const modButton = event.target.closest('.mod-button');
+  if (modButton) {
+    const field = event.target.closest('.button-group')?.dataset.field;
+    if (field) {
+      updateCharge(details.dataset.code, field, modButton.dataset.value);
+      renderCharges();
+    }
   }
 });
 
@@ -347,21 +362,11 @@ $('#charges').addEventListener('toggle', event => {
   if (event.target.matches('.charge') && event.target.open) lastOpened = event.target.dataset.code;
 }, true);
 
-$('#charges').addEventListener('change', event => {
-  const details = event.target.closest('.charge');
-  if (details && event.target.dataset.field) updateCharge(details.dataset.code, event.target.dataset.field, event.target.value);
-});
-
 $('#clear').addEventListener('click', () => {
   state = [];
   lastOpened = '';
   save();
   renderCharges();
-});
-
-$('#baseTerm').addEventListener('input', event => {
-  baseTerm = Number(event.target.value);
-  calculate();
 });
 
 document.addEventListener('keydown', event => {
