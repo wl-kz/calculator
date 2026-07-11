@@ -156,8 +156,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mods{display:grid;grid-template-columns:1fr;gap:10px}
 .mod-row{display:flex;flex-direction:column;gap:6px}
 .mod-row>span{color:#8fa1ad;font-size:10px;font-weight:700;letter-spacing:.035em;text-transform:uppercase}
-.button-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:4px}
-.mod-button{padding:8px 10px;border:1px solid #40515e;background:#121b23;color:#dde5ea;font-size:11px;font-weight:600;cursor:pointer;transition:all .1s}
+.button-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(65px,1fr));gap:4px;min-height:32px}
+.mod-button{padding:8px 6px;border:1px solid #40515e;background:#121b23;color:#dde5ea;font-size:10px;font-weight:600;cursor:pointer;transition:all .1s;white-space:normal;line-height:1.2;min-height:32px;display:flex;align-items:center;justify-content:center;text-align:center}
 .mod-button:hover{background:#1a242f;border-color:#5a6f7f}
 .mod-button.active{background:#5a8fbf;color:#fff;border-color:#5a8fbf}
 .repeat-control{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px solid #26343e}
