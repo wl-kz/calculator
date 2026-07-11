@@ -1,7 +1,7 @@
 const {articleNames, articles, typeNames, levelNames, levelLabels} = window.KZ_DATA;
 
 const modifierOptions = {
-  intent: [['aware', 'Осознанность'], ['careless', 'Неосторожность']],
+  intent: [['aware', 'Осознано'], ['careless', 'Неосторожность']],
   finish: [['complete', 'Окончено или покушение'], ['stopped', 'Добровольная остановка']],
   ready: [['planned', 'Предварительный план'], ['affect', 'Аффект'], ['conspiracy', 'Заговор']],
   reason: [['none', 'Без модификатора'], ['necessity', 'Крайняя необходимость: смягчить'], ['necessity-none', 'Крайняя необходимость: снять наказание'], ['assistance', 'Содействие следствию'], ['official', 'Должностным лицом / против него']]
