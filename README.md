@@ -2,7 +2,7 @@
 
 Быстрый расчет сроков наказания по КЗ Corvax Whitelist для Space Station 14.
 
-## Что это
+## Что это (ЧЗХ?)
 
 - Выбираете статьи КЗ
 - Устанавливаете модификаторы (умысел, завершённость, готовность, намерения)
@@ -15,6 +15,6 @@
 
 ## Разработка
 
-Создано wzzker21 для облегчения работы со сроками по КЗ Corvax Whitelist.
+Создано wzzker21 для облегчения работы со сроками по КЗ Corvax Whitelist. (С ЛЮБОВЬЮ!!)
 
-Ссылки: [Wiki](https://station14.ru/wiki/WL:%D0%9A%D0%BE%D1%80%D0%BF%D0%BE%D1%80%D0%B0%D1%82%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD) | [GitHub](https://github.com/wl-kz/calculator)
+Ссылки: [Wiki](https://station14.ru/wiki/WL:%D0%9A%D0%BE%D1%80%D0%BF%D0%BE%D1%80%D0%B0%D1%82%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD) 
