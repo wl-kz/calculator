@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f5f6">
+  <title>КЗ -- калькулятор срока</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell" id="calculator">
+    <div class="workspace">
+      <section class="panel catalog-panel" aria-labelledby="catalog-title">
+        <div class="section-head">
+          <div class="catalog-title">
+            <h1 id="catalog-title">Корпоративный Закон <span>(Corvax Whitelist)</span></h1>
+            <a class="source-link" target="_blank" rel="noreferrer" href="https://station14.ru/wiki/WL:%D0%9A%D0%BE%D1%80%D0%BF%D0%BE%D1%80%D0%B0%D1%82%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD">Источник ↗</a>
+          </div>
+          <div class="catalog-actions">
+            <div class="layout-toggle" id="layoutToggle" aria-label="Расположение калькулятора">
+              <button type="button" data-layout="split">Раздельно</button>
+              <button type="button" data-layout="stack">Снизу</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="catalog-tools">
+          <label class="search-field" for="search">
+            <span class="search-icon" aria-hidden="true"></span>
+            <input id="search" type="search" placeholder="Номер или название статьи" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <div class="filters" id="filters" aria-label="Фильтр по тяжести"></div>
+        </div>
+
+        <div id="articles" class="articles"></div>
+      </section>
+
+      <aside class="side-column">
+        <section class="panel result-panel" aria-labelledby="result-title">
+          <div class="section-head compact">
+            <h2 id="result-title">Итог</h2>
+          </div>
+          <div id="verdict"></div>
+          <div class="term-choice" id="termChoice">
+            <div class="term-label"><label for="baseTerm">Срок основной статьи</label><output id="termValue"></output></div>
+            <input id="baseTerm" type="range">
+            <div class="range-labels"><span id="termMin"></span><span id="termMax"></span></div>
+          </div>
+          <div class="breakdown" id="breakdown"></div>
+        </section>
+
+        <section class="panel case-panel" aria-labelledby="case-title">
+          <div class="section-head compact">
+            <h2 id="case-title">Выбранные статьи</h2>
+            <button class="text-button" id="clear" type="button">Очистить</button>
+          </div>
+          <div id="empty" class="empty-state">
+            <span class="empty-mark" aria-hidden="true">+</span>
+            <b>Дело пока пустое</b>
+            <p>Нажмите на статью слева, чтобы добавить её в расчёт.</p>
+          </div>
+          <div id="charges" class="charges"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script src="data/articles.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
