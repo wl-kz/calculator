@@ -4,7 +4,7 @@ const modifierOptions = {
   intent: [['aware', 'Осознано'], ['careless', 'Неосторожность']],
   finish: [['complete', 'Завершено'], ['stopped', 'Прервано']],
   ready: [['planned', 'Плановое'], ['conspiracy', 'Заговор'], ['affect', 'Аффект'], ['other', 'Иное']],
-  reason: [['none', 'Нет'], ['necessity', 'Необходимость'], ['necessity-none', 'Необходимость (снять)'], ['assistance', 'Помощь'], ['official', 'Должностное']]
+  reason: [['none', 'Нет'], ['necessity', 'Необходимость'], ['necessity-none', 'Необходимость (снять)'], ['assistance', 'Помощь'], ['official', 'Должно[...]
 };
 
 const $ = selector => document.querySelector(selector);
@@ -40,7 +40,7 @@ function normalizeCharge(saved) {
     intent: saved.intent === -1 || saved.intent === 'careless' ? 'careless' : 'aware',
     finish: saved.finish === -1 || saved.finish === 'stopped' ? 'stopped' : 'complete',
     ready: saved.ready === -1 || saved.ready === 'affect' ? 'affect' : saved.ready === 1 || saved.ready === 'conspiracy' ? 'conspiracy' : saved.ready === 'other' ? 'other' : 'planned',
-    reason: saved.reason === -9 || saved.reason === 'necessity-none' ? 'necessity-none' : saved.reason === -1 || saved.reason === 'necessity' ? 'necessity' : saved.reason === 1 || saved.reason === 'official' ? 'official' : saved.reason === 'assistance' ? 'assistance' : 'none',
+    reason: saved.reason === -9 || saved.reason === 'necessity-none' ? 'necessity-none' : saved.reason === -1 || saved.reason === 'necessity' ? 'necessity' : saved.reason === 1 || saved.reason ===[...]
     repeat: clamp(Number(saved.repeat) || 1, 1, 5)
   };
 }
@@ -73,7 +73,7 @@ function renderFilters() {
   ];
   $('#filters').innerHTML = options.map(([value, label]) => {
     const active = String(filter) === value;
-    return `<button class="filter-button${value === 'selected' ? ' selected-filter' : ''}${active ? ' active' : ''}" type="button" data-filter="${value}" aria-pressed="${active}">${label}</button>`;
+    return `<button class="filter-button${value === 'selected' ? ' selected-filter' : ''}${active ? ' active' : ''}" type="button" data-filter="${value}" aria-pressed="${active}">${label}</button>[...]
   }).join('');
 }
 
@@ -116,7 +116,7 @@ function setLayout(nextLayout) {
 
 function articleButton(article) {
   const selected = state.some(charge => charge.code === article.code);
-  return `<button class="article-card${selected ? ' selected' : ''}" type="button" data-code="${article.code}" aria-pressed="${selected}" title="${esc(article.description)}" ${severityStyle(article.level)}>
+  return `<button class="article-card${selected ? ' selected' : ''}" type="button" data-code="${article.code}" aria-pressed="${selected}" title="${esc(article.description)}" ${severityStyle(artic[...]
     <span class="article-code">${article.code}</span>
     <span class="article-name">${esc(article.name)}</span>
     <span class="check" aria-hidden="true">✓</span>
@@ -156,7 +156,7 @@ function renderArticles() {
 }
 
 function buttonGroupMarkup(field, current) {
-  return `<div class="button-group" data-field="${field}">${modifierOptions[field].map(([value, label]) => `<button type="button" class="mod-button${value === current ? ' active' : ''}" data-value="${value}" title="${label}">${label}</button>`).join('')}</div>`;
+  return `<div class="button-group" data-field="${field}">${modifierOptions[field].map(([value, label]) => `<button type="button" class="mod-button${value === current ? ' active' : ''}" data-valu[...]
 }
 
 function modifierDelta(charge) {
@@ -268,7 +268,7 @@ function calculate() {
   }
 
   $('#termChoice').style.display = highest === 3 || highest === 4 ? 'block' : 'none';
-  $('#verdict').innerHTML = `<div class="verdict"><span class="verdict-status">${esc(status)}</span><div class="verdict-value">${esc(result)}</div><span class="verdict-main">${main ? `Основная статья ${main.code}` : 'Расчёт обновляется автоматически'}</span></div>`;
+  $('#verdict').innerHTML = `<div class="verdict"><span class="verdict-status">${esc(status)}</span><div class="verdict-value">${esc(result)}</div><span class="verdict-main">${main ? `Основ[...]
 
   const ignored = active.length - byType.length;
   const total = highest === 3 || highest === 4 ? baseTerm + additions : 0;
@@ -276,7 +276,7 @@ function calculate() {
     main && `<div class="breakdown-row"><span>Основная статья</span><span>${main.code} · X${main.effective}</span></div>`,
     additions > 0 && `<div class="breakdown-row"><span>Дополнительные статьи</span><span>+${additions} минут</span></div>`,
     disciplinary && `<div class="breakdown-row"><span>Дисциплинарно</span><span>${disciplinary}</span></div>`,
-    ignored > 0 && `<div class="breakdown-row"><span>Один тип</span><span>${ignored} ${ignored === 1 ? 'статья не суммируется' : 'статьи не суммируются'}</span></div>`,
+    ignored > 0 && `<div class="breakdown-row"><span>Один тип</span><span>${ignored} ${ignored === 1 ? 'статья не суммируется' : 'статьи не суммируютс[...]
     total >= 40 && highest < 5 && '<div class="warning">Срок 40+ минут: допускается отбывание наказания в пермабриге.</div>'
   ].filter(Boolean);
   $('#breakdown').innerHTML = rows.join('');
@@ -367,6 +367,12 @@ $('#clear').addEventListener('click', () => {
   lastOpened = '';
   save();
   renderCharges();
+});
+
+$('#baseTerm').addEventListener('input', event => {
+  baseTerm = clamp(Number(event.target.value) || 15, 15, 45);
+  $('#termValue').textContent = `${baseTerm} мин`;
+  calculate();
 });
 
 document.addEventListener('keydown', event => {
