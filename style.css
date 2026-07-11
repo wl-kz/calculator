@@ -159,7 +159,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .button-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:4px}
 .mod-button{padding:8px 10px;border:1px solid #40515e;background:#121b23;color:#dde5ea;font-size:11px;font-weight:600;cursor:pointer;transition:all .1s}
 .mod-button:hover{background:#1a242f;border-color:#5a6f7f}
-.mod-button.active{background:var(--severity);color:#fff;border-color:var(--severity)}
+.mod-button.active{background:#5a8fbf;color:#fff;border-color:#5a8fbf}
 .repeat-control{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px solid #26343e}
 .repeat-control label span{display:block;margin-top:3px;color:#697b87;font-size:9px;font-weight:500;letter-spacing:0;text-transform:none}
 .stepper{display:flex;align-items:center;border:0;overflow:hidden}
