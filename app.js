@@ -12,6 +12,17 @@ const esc = value => String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const normalizeText = value => String(value).toLowerCase().replaceAll('ё', 'е');
 
+const emptyMessages = [
+  'Спокойно, шериф. Дел нет.',
+  'Спи, солдат. Всё тихо.',
+  'Всё путём, ковбой.',
+  'Здесь ничего не происходит.',
+  'Тишина. Мир спит.',
+  'Станция в порядке.',
+  'Никаких происшествий.'
+];
+const getRandomMessage = () => emptyMessages[Math.floor(Math.random() * emptyMessages.length)];
+
 function loadArray(key) {
   try {
     const value = JSON.parse(localStorage.getItem(key) || '[]');
@@ -170,6 +181,7 @@ function levelShiftMarkup(charge) {
 
 function renderCharges() {
   $('#empty').hidden = Boolean(state.length);
+  $('#emptyTitle').textContent = getRandomMessage();
   $('#clear').disabled = !state.length;
   $('#charges').innerHTML = state.map(charge => `<details class="charge" data-code="${charge.code}" ${charge.code === lastOpened ? 'open' : ''} ${severityStyle(charge.level)}>
     <summary>
