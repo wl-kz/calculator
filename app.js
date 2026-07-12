@@ -604,6 +604,10 @@ function updateChargeLevels() {
 function calculate() {
   $('.result-panel').classList.toggle('has-selection', state.length > 0);
 
+  const hasAssistance = state.some(
+    charge => charge.reason === 'assistance'
+  );
+
   const active = state
     .map(charge => ({
       ...charge,
@@ -716,6 +720,13 @@ function calculate() {
       : 0;
 
   const rows = [
+    hasAssistance &&
+      `
+        <div class="warning discretion-warning">
+          Содействие следствию: ГСБ может смягчить наказание по своему усмотрению.
+        </div>
+      `,
+
     main &&
       `
         <div class="breakdown-row">
