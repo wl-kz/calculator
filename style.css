@@ -76,6 +76,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .catalog-title h1{font-size:19px}
 .catalog-title h1 span{color:var(--muted);font-weight:500}
 .catalog-actions{display:flex;align-items:center;gap:10px}
+.author-mark{min-width:110px;margin-right:96px;color:#586874;text-align:center;font:700 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em;text-transform:lowercase}
+.header-art{width:84px;height:52px;display:block;object-fit:contain;object-position:center}
 .layout-toggle{display:flex}
 .layout-toggle button{padding:8px 11px;border:0;background:var(--surface-alt);color:var(--muted);cursor:pointer;font-size:11px;transition:background-color .12s,color .12s}
 .layout-toggle button:hover{background:var(--surface-hover);color:#c4d0d8}
@@ -231,6 +233,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .shell{width:min(100% - 18px,1580px)}
   .section-head{align-items:flex-start;flex-direction:column}
   .catalog-actions{width:100%;justify-content:space-between}
+  .author-mark{min-width:0;margin-right:0}
+  .header-art{width:64px;height:42px}
   .catalog-tools{grid-template-columns:1fr}
   .filters{overflow-x:auto}
   .workspace .side-column,.workspace.layout-stack .side-column{grid-template-columns:1fr}
