@@ -118,6 +118,27 @@ let layoutMode =
     : 'split';
 
 let layoutSwitching = false;
+let sirenActive = false;
+
+const alarmAudio = $('#alarmAudio');
+alarmAudio.volume = 0.35;
+
+function setSirenMode(active) {
+  document.documentElement.classList.toggle('siren-mode', active);
+
+  if (active === sirenActive) return;
+
+  sirenActive = active;
+
+  if (active) {
+    alarmAudio.currentTime = 0;
+    alarmAudio.play().catch(() => {});
+    return;
+  }
+
+  alarmAudio.pause();
+  alarmAudio.currentTime = 0;
+}
 
 function save() {
   localStorage.setItem('kz-case', JSON.stringify(state));
@@ -604,6 +625,37 @@ function updateChargeLevels() {
 function calculate() {
   $('.result-panel').classList.toggle('has-selection', state.length > 0);
 
+  const allArticlesSelected = state.length === articles.length;
+
+  setSirenMode(allArticlesSelected);
+
+  if (allArticlesSelected) {
+    $('#termChoice').style.display = 'none';
+
+    $('#verdict').innerHTML = `
+      <div class="verdict siren-verdict">
+        <div class="verdict-value">КОСМИРОВАТЬ НЕМЕДЛЕННО!</div>
+      </div>
+    `;
+
+    $('#breakdown').innerHTML = '';
+    updateChargeLevels();
+    save();
+
+    window.calculation = {
+      active: state,
+      byType: [],
+      highest: 5,
+      main: null,
+      additions: 0,
+      result: 'КОСМИРОВАТЬ НЕМЕДЛЕННО!',
+      status: 'Все статьи выбраны',
+      disciplinary: ''
+    };
+
+    return;
+  }
+
   const hasAssistance = state.some(
     charge => charge.reason === 'assistance'
   );
@@ -1005,6 +1057,12 @@ document.addEventListener('keydown', event => {
     $('#search').blur();
   }
 });
+
+document.addEventListener('pointerdown', () => {
+  if (sirenActive && alarmAudio.paused) {
+    alarmAudio.play().catch(() => {});
+  }
+}, {passive: true});
 
 applyLayout();
 renderFilters();

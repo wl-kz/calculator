@@ -53,6 +53,7 @@ html::after{content:"";position:fixed;inset:0;width:200%;height:100%;pointer-eve
 html::before{z-index:0;background-image:url("assets/stars-bg-1.png");animation:stars-drift 400s linear infinite}
 html::after{z-index:0;background-image:url("assets/stars-bg-2.png");animation:stars-drift-far 400s linear infinite}
 body{position:relative;z-index:1;margin:0;background:transparent;color:var(--text);font:15px/1.5 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+body::after{content:"";position:fixed;z-index:9999;inset:0;pointer-events:none;background:#e00016;opacity:0}
 button,input,select,textarea{font:inherit}
 button{color:inherit}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -101,8 +102,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 .articles{min-width:0;padding:4px 0 0;background:#090e13;overflow-x:auto}
 .law-matrix{display:grid;grid-template-columns:70px repeat(5,1fr);gap:2px;background:#090e13}
-@media(max-width:800px){.law-matrix{grid-template-columns:60px repeat(4,1fr)}.law-matrix .severity-heading:nth-child(7){display:none}}
-@media(max-width:600px){.law-matrix{grid-template-columns:50px repeat(3,1fr)}.law-matrix .severity-heading:nth-child(6),.law-matrix .severity-heading:nth-child(7){display:none}}
 .matrix-corner,.severity-heading,.type-heading{border:0;background:var(--surface-alt);color:#73838f}
 .matrix-corner{display:grid;place-items:center;color:#596a77;font:700 7px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
 .severity-heading{min-height:67px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:9px 12px;position:relative;overflow:hidden;background:var(--severity-bg);color:#eee;text-align:center}
@@ -146,6 +145,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .verdict-status{color:var(--muted);font:700 10px/1.4 ui-monospace,monospace;letter-spacing:.09em;text-transform:uppercase}
 .verdict-value{margin:9px 0 7px;color:#f0f5f8;font-size:38px;line-height:1.08;font-weight:730;letter-spacing:-.03em}
 .verdict-main{color:var(--muted);font-size:12px}
+.siren-verdict .verdict-status{color:#ff9a9a}
+.siren-verdict .verdict-value{max-width:390px;margin-inline:auto;color:#fff;font-size:clamp(25px,3vw,38px);text-shadow:0 0 18px rgba(255,25,25,.9);animation:siren-shake .13s steps(2,end) infinite}
+.siren-verdict .verdict-main{color:#d99a9a}
 .term-choice{display:none;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--surface-alt)}
 .term-label,.range-labels{display:flex;align-items:center;justify-content:space-between}
 .term-label{margin-bottom:10px;color:var(--muted);font-size:11px;font-weight:650}
@@ -218,6 +220,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 @keyframes stars-drift{to{transform:translate3d(-50%,0,0)}}
 @keyframes stars-drift-far{to{transform:translate3d(-100%,0,0)}}
+@keyframes siren-flash{0%,100%{opacity:.04}50%{opacity:.24}}
+@keyframes siren-pulse{0%,100%{box-shadow:inset 0 0 80px rgba(255,0,20,.08)}50%{box-shadow:inset 0 0 170px rgba(255,0,20,.34)}}
+@keyframes siren-shake{0%{transform:translate(0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-1px)}100%{transform:translate(1px,1px)}}
+
+html.siren-mode{--accent:#ff5b64;--accent-hover:#ff747c;--accent-strong:#b82d38;--accent-soft:#42161c;--accent-soft-hover:#572028;--accent-text:#fff0f1}
+html.siren-mode body::after{animation:siren-flash .72s ease-in-out infinite}
+html.siren-mode #calculator{animation:siren-pulse .72s ease-in-out infinite}
+html.siren-mode .panel{box-shadow:inset 0 0 0 1px rgba(230,54,65,.28)}
 
 @media(max-width:1380px){
   .workspace,.workspace.layout-stack{display:block}
@@ -231,22 +241,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 }
 
 @media(max-width:760px){
-  .shell{width:min(100% - 18px,1580px)}
-  .section-head{align-items:flex-start;flex-direction:column}
+  .shell{width:100%}
+  #calculator{padding:8px}
+  .section-head{min-height:0;align-items:flex-start;flex-direction:column;padding:12px;gap:10px}
+  .catalog-title{gap:7px 11px}
+  .catalog-title h1{width:100%;font-size:18px}
+  .source-link{font-size:11px}
   .catalog-actions{width:100%;justify-content:space-between}
   .author-mark{min-width:0;margin-right:0}
-  .header-art{width:64px;height:42px}
-  .catalog-tools{grid-template-columns:1fr}
-  .filters{overflow-x:auto}
+  .header-art{width:52px;height:46px}
+  .catalog-tools{grid-template-columns:1fr;padding:10px 12px;gap:9px}
+  .search-field{height:42px}
+  .filters{padding-bottom:3px;overflow-x:auto;scrollbar-width:thin}
+  .filter-button{height:40px;min-width:48px;flex:0 0 auto}
+  .filter-button.selected-filter{min-width:108px}
+  .articles{scrollbar-width:thin;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+  .law-matrix{grid-template-columns:64px repeat(5,155px);min-width:839px}
+  .matrix-corner,.type-heading{position:sticky;left:0;z-index:4}
+  .matrix-corner{z-index:6}
+  .severity-heading{min-height:62px;padding:8px}
+  .type-heading,.article-card{min-height:68px}
+  .article-card{padding:9px 24px}
+  .article-card .article-name{font-size:12px}
   .workspace .side-column,.workspace.layout-stack .side-column{grid-template-columns:1fr}
   .workspace .case-panel,.workspace.layout-stack .case-panel{grid-column:1;grid-row:auto;order:1}
   .workspace .result-panel,.workspace.layout-stack .result-panel{grid-column:1;grid-row:auto;order:2}
   .results-mode{grid-template-columns:1fr}
+  .charge summary{padding:12px 10px;gap:7px}
+  .charge-name b{font-size:13px;white-space:normal}
+  .charge-body{padding:12px 10px 14px}
   .mod-row{grid-template-columns:1fr;gap:5px}
   .necessity-choice{grid-template-columns:1fr}
+  .breakdown-row{grid-template-columns:minmax(90px,.8fr) minmax(0,1.2fr);gap:10px}
 }
 
 @media(prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important}
   html::before,html::after{animation:none}
+  html.siren-mode body::after{animation:none;opacity:.14}
+  html.siren-mode #calculator,.siren-verdict .verdict-value{animation:none}
 }
