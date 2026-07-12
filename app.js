@@ -119,9 +119,71 @@ let layoutMode =
 
 let layoutSwitching = false;
 let sirenActive = false;
+let alarmHasPlayed = false;
+let alarmStartPending = false;
+let alarmFadeFrame = 0;
 
 const alarmAudio = $('#alarmAudio');
-alarmAudio.volume = 0.35;
+const alarmVolume = 0.35;
+alarmAudio.volume = alarmVolume;
+
+function cancelAlarmFade() {
+  if (alarmFadeFrame) {
+    cancelAnimationFrame(alarmFadeFrame);
+    alarmFadeFrame = 0;
+  }
+}
+
+function startAlarm() {
+  if (!sirenActive || alarmHasPlayed || alarmStartPending) return;
+
+  cancelAlarmFade();
+  alarmStartPending = true;
+  alarmAudio.volume = alarmVolume;
+  alarmAudio.currentTime = 0;
+
+  alarmAudio.play()
+    .then(() => {
+      if (sirenActive) alarmHasPlayed = true;
+    })
+    .catch(() => {})
+    .finally(() => {
+      alarmStartPending = false;
+    });
+}
+
+function fadeOutAlarm(duration = 300) {
+  cancelAlarmFade();
+
+  if (alarmAudio.paused) {
+    alarmAudio.currentTime = 0;
+    alarmAudio.volume = alarmVolume;
+    return;
+  }
+
+  const startedAt = performance.now();
+  const startingVolume = alarmAudio.volume;
+
+  const fade = now => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    alarmAudio.volume = startingVolume * (1 - progress);
+
+    if (progress < 1 && !sirenActive) {
+      alarmFadeFrame = requestAnimationFrame(fade);
+      return;
+    }
+
+    alarmFadeFrame = 0;
+
+    if (!sirenActive) {
+      alarmAudio.pause();
+      alarmAudio.currentTime = 0;
+      alarmAudio.volume = alarmVolume;
+    }
+  };
+
+  alarmFadeFrame = requestAnimationFrame(fade);
+}
 
 function setSirenMode(active) {
   document.documentElement.classList.toggle('siren-mode', active);
@@ -131,13 +193,13 @@ function setSirenMode(active) {
   sirenActive = active;
 
   if (active) {
-    alarmAudio.currentTime = 0;
-    alarmAudio.play().catch(() => {});
+    alarmHasPlayed = false;
+    startAlarm();
     return;
   }
 
-  alarmAudio.pause();
-  alarmAudio.currentTime = 0;
+  alarmHasPlayed = false;
+  fadeOutAlarm();
 }
 
 function save() {
@@ -1059,9 +1121,7 @@ document.addEventListener('keydown', event => {
 });
 
 document.addEventListener('pointerdown', () => {
-  if (sirenActive && alarmAudio.paused) {
-    alarmAudio.play().catch(() => {});
-  }
+  startAlarm();
 }, {passive: true});
 
 applyLayout();
