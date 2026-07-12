@@ -1,10 +1,25 @@
 const {articleNames, articles, typeNames, levelNames, levelLabels} = window.KZ_DATA;
 
 const modifierOptions = {
-  intent: [['aware', 'Осознано'], ['careless', 'Неосторожность']],
+  intent: [['aware', 'Осознанно'], ['careless', 'Неосторожность']],
   finish: [['complete', 'Завершено'], ['stopped', 'Прервано']],
   ready: [['planned', 'Плановое'], ['conspiracy', 'Заговор'], ['affect', 'Аффект'], ['other', 'Иное']],
-  reason: [['none', 'Нет'], ['necessity', 'Необходимость'], ['necessity-none', 'Необходимость (снять)'], ['assistance', 'Помощь'], ['official', 'Должностное']]
+  reason: [['none', 'Нет'], ['necessity', 'Крайняя необходимость'], ['assistance', 'Содействие'], ['official', 'Должностное лицо']]
+};
+
+const modifierHints = {
+  aware: 'Деяние совершено осознанно.',
+  careless: 'Деяние совершено без преднамеренного умысла.',
+  complete: 'Правонарушение доведено до конца.',
+  stopped: 'Лицо добровольно прекратило правонарушение.',
+  planned: 'Имелись предварительный план или подготовка.',
+  conspiracy: 'К совершению привлекались соучастники.',
+  affect: 'Деяние совершено в состоянии сильного аффекта.',
+  other: 'Другие обстоятельства готовности.',
+  none: 'Дополнительных обстоятельств нет.',
+  necessity: 'Экстренные действия для предотвращения более серьёзного вреда.',
+  assistance: 'Добровольное содействие следствию.',
+  official: 'Нарушение совершено должностным лицом или против него.'
 };
 
 const $ = selector => document.querySelector(selector);
@@ -355,15 +370,21 @@ function renderArticles() {
 }
 
 function buttonGroupMarkup(field, current) {
+  const displayedCurrent =
+    field === 'reason' && current === 'necessity-none'
+      ? 'necessity'
+      : current;
+
   return `
-    <div class="button-group" data-field="${field}">
+    <div class="button-group options-${modifierOptions[field].length}" data-field="${field}" role="group">
       ${modifierOptions[field]
         .map(([value, label]) => `
           <button
             type="button"
-            class="mod-button${value === current ? ' active' : ''}"
+            class="mod-button${value === displayedCurrent ? ' active' : ''}"
             data-value="${value}"
-            title="${label}"
+            title="${esc(modifierHints[value] || label)}"
+            aria-pressed="${value === displayedCurrent}"
           >
             ${label}
           </button>
@@ -437,7 +458,14 @@ function renderCharges() {
   $('#clear').disabled = !state.length;
 
   $('#charges').innerHTML = state
-    .map(charge => `
+    .map(charge => {
+      const modifiersChanged =
+        charge.intent !== 'aware' ||
+        charge.finish !== 'complete' ||
+        charge.ready !== 'planned' ||
+        charge.reason !== 'none';
+
+      return `
       <details
         class="charge"
         data-code="${charge.code}"
@@ -470,7 +498,13 @@ function renderCharges() {
             ${esc(charge.description)}
           </p>
 
-          <div class="mods">
+          <div class="mods-shell">
+            <div class="mods-head">
+              <span>Обстоятельства дела</span>
+              <button type="button" class="mods-reset${modifiersChanged ? '' : ' is-hidden'}" data-reset-modifiers ${modifiersChanged ? '' : 'disabled'}>Сбросить</button>
+            </div>
+
+            <div class="mods">
             <div class="mod-row">
               <span>Умысел</span>
               ${buttonGroupMarkup('intent', charge.intent)}
@@ -489,6 +523,24 @@ function renderCharges() {
             <div class="mod-row">
               <span>Намерения</span>
               ${buttonGroupMarkup('reason', charge.reason)}
+            </div>
+
+            ${
+              charge.reason === 'necessity' || charge.reason === 'necessity-none'
+                ? `
+                  <div class="necessity-choice">
+                    <span>
+                      Решение по крайней необходимости
+                      <small>КЗ допускает смягчение либо отсутствие наказания.</small>
+                    </span>
+                    <div class="necessity-actions" role="group" aria-label="Решение по крайней необходимости">
+                      <button type="button" data-necessity="necessity" class="${charge.reason === 'necessity' ? 'active' : ''}" aria-pressed="${charge.reason === 'necessity'}">Смягчить</button>
+                      <button type="button" data-necessity="necessity-none" class="${charge.reason === 'necessity-none' ? 'active' : ''}" aria-pressed="${charge.reason === 'necessity-none'}">Снять статью</button>
+                    </div>
+                  </div>
+                `
+                : ''
+            }
             </div>
           </div>
 
@@ -527,7 +579,8 @@ function renderCharges() {
           </div>
         </div>
       </details>
-    `)
+    `;
+    })
     .join('');
 
   calculate();
@@ -549,6 +602,8 @@ function updateChargeLevels() {
 }
 
 function calculate() {
+  $('.result-panel').classList.toggle('has-selection', state.length > 0);
+
   const active = state
     .map(charge => ({
       ...charge,
@@ -812,6 +867,36 @@ $('#charges').addEventListener('click', event => {
   }
 
   const step = event.target.closest('[data-step]');
+
+  const resetModifiers = event.target.closest('[data-reset-modifiers]');
+
+  if (resetModifiers) {
+    const charge = state.find(
+      item => item.code === details.dataset.code
+    );
+
+    if (!charge) return;
+
+    charge.intent = 'aware';
+    charge.finish = 'complete';
+    charge.ready = 'planned';
+    charge.reason = 'none';
+    save();
+    renderCharges();
+    return;
+  }
+
+  const necessity = event.target.closest('[data-necessity]');
+
+  if (necessity) {
+    updateCharge(
+      details.dataset.code,
+      'reason',
+      necessity.dataset.necessity
+    );
+    renderCharges();
+    return;
+  }
 
   if (step) {
     const charge = state.find(
